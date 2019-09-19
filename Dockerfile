@@ -1,53 +1,49 @@
-# Specify base image
 FROM ubuntu:16.04
 
-# install bookworm deps
+# config
+ENV MYSQL_PASSWORD=womp
+ENV MYSQL_ROOT=keeper
+ENV MYSQL_USER=reader
+
 RUN echo ' * installing bookworm system deps'
 RUN apt-get update -y && \
   apt-get upgrade -y && \
   apt-get dist-upgrade -y && \
+  echo mysql-server mysql-server/root_password password $MYSQL_PASSWORD | debconf-set-selections && \
+  echo mysql-server mysql-server/root_password_again password $MYSQL_PASSWORD | debconf-set-selections && \
   apt-get install -y gcc \
     build-essential \
     python-dev \
+    python-pip \
     libmysqlclient-dev \
     parallel \
     git \
-    vim
+    vim \
+    mysql-server
 
-# install python deps
-RUN echo ' * installing python deps'
-RUN apt-get install -y python-dev python-pip
-
-# install python packages
+RUN echo ' * installing python packages'
 RUN pip install regex==2019.8.19 \
   nltk==3.4.5 \
   numpy==1.16 \
   mysql-python==1.2.5 \
   python-dateutil==2.8.0
 
-# install LAMP stack deps
-RUN echo ' * installing LAMP stack deps'
-
-# set the root user password and bypass the password prompt on mysql install
-RUN echo mysql-server mysql-server/root_password password womp | debconf-set-selections && \
-  echo mysql-server mysql-server/root_password_again password womp | debconf-set-selections
-
-RUN apt-get -y install mysql-server && \
-  /etc/init.d/mysql start && \
-  export keeper=keeper && \
-  export reader=reader && \
-  export keeperpass=womp && \
-  export readerpass=womp && \
-  mysql -u root -p --execute=" \
-    CREATE USER IF NOT EXISTS $keeper@'localhost' IDENTIFIED BY '$keeperpass'; \
-    GRANT ALL PRIVILEGES ON *.* TO $keeper@'localhost' WITH GRANT OPTION; \
-    CREATE USER IF NOT EXISTS $keeper@'%' IDENTIFIED BY '$keeperpass'; \
-    GRANT ALL PRIVILEGES ON *.* TO $keeper@'%' WITH GRANT OPTION; \
+RUN echo ' * configuring MYSQL'
+RUN mkdir -p /var/run/mysqld
+RUN mkdir -p /var/lib/mysql
+RUN find /var/lib/mysql -type f | xargs touch && \
+  chown -R mysql:mysql /var/lib/mysql /var/run/mysqld && \
+  service mysql start && \
+  mysql --user root --password=$MYSQL_PASSWORD --execute=" \
+    CREATE USER IF NOT EXISTS $MYSQL_ROOT@'localhost' IDENTIFIED BY '$MYSQL_PASSWORD'; \
+    GRANT ALL PRIVILEGES ON *.* TO $MYSQL_ROOT@'localhost' WITH GRANT OPTION; \
+    CREATE USER IF NOT EXISTS $MYSQL_ROOT@'%' IDENTIFIED BY '$MYSQL_PASSWORD'; \
+    GRANT ALL PRIVILEGES ON *.* TO $MYSQL_ROOT@'%' WITH GRANT OPTION; \
     \
-    CREATE USER IF NOT EXISTS $reader@'localhost' IDENTIFIED BY '$readerpass'; \
-    GRANT SELECT ON *.* TO $reader@'localhost' WITH GRANT OPTION; \
-    CREATE USER IF NOT EXISTS $reader@'%' IDENTIFIED BY '$readerpass'; \
-    GRANT SELECT ON *.* TO $reader@'%' WITH GRANT OPTION; \
+    CREATE USER IF NOT EXISTS $MYSQL_USER@'localhost' IDENTIFIED BY '$MYSQL_PASSWORD'; \
+    GRANT SELECT ON *.* TO $MYSQL_USER@'localhost' WITH GRANT OPTION; \
+    CREATE USER IF NOT EXISTS $MYSQL_USER@'%' IDENTIFIED BY '$MYSQL_PASSWORD'; \
+    GRANT SELECT ON *.* TO $MYSQL_USER@'%' WITH GRANT OPTION; \
     \
     CREATE USER IF NOT EXISTS 'www-data'@'localhost'; \
     GRANT ALL PRIVILEGES ON *.* TO 'www-data'@'localhost'; \
