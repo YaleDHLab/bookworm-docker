@@ -21,6 +21,7 @@ RUN apt-get update -y && \
     python-pip \
     parallel \
     git \
+    curl \
     vim
 
 # enable cgi-bin
@@ -59,6 +60,9 @@ RUN find /var/lib/mysql -type f | xargs touch && \
     GRANT ALL PRIVILEGES ON *.* TO 'www-data'@'localhost'; \
     CREATE USER IF NOT EXISTS 'www-data'@'%'; \
     GRANT ALL PRIVILEGES ON *.* TO 'www-data'@'%'; \
+    \
+    CREATE USER IF NOT EXISTS 'nobody'@'localhost'; \
+    GRANT SELECT ON *.* TO 'nobody'@'localhost' WITH GRANT OPTION; \
     \
     CREATE USER IF NOT EXISTS 'admin'@'localhost'; \
     GRANT RELOAD,PROCESS ON *.* TO 'admin'@'localhost'; \
