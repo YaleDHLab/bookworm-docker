@@ -1,8 +1,8 @@
-Bookworm Docker
+# Bookworm Docker
 
 Making it easier to visualize [BookwormDB](https://github.com/Bookworm-project/BookwormDB) instances.
 
-# Quickstart
+## Quickstart
 
 ```
 # download sample input data
@@ -26,7 +26,7 @@ Once you're done examining your visualization, stop the container:
 docker ps -a | grep bookworm | awk '{print $1}' | xargs docker stop
 ```
 
-# Preparing Custom Data
+## Preparing Custom Data
 
 To build a new bookworm using this repository, you need to place three files in `./data`:
 
@@ -79,7 +79,7 @@ Example `jsoncatalog.txt`:
 ```
 Once you've prepared these three files, create a fresh clone of this repository, place those files in `./data`, and run the commands above to create your bookworm!
 
-# Development
+## Development
 
 ```
 # find the ids of all bookworm images
