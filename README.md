@@ -12,7 +12,7 @@ wget https://lab-data-collections.s3.amazonaws.com/sample-bookworm-inputs.tar.gz
   mv sample-bookworm-inputs data
 
 # build the base bookworm image
-docker build --tag bookworm:latest --file init/Dockerfile .
+docker build --tag bookworm:latest --file Dockerfile .
 
 # process the data within `./data` inside the container
 bash build.sh
