@@ -18,7 +18,7 @@ docker build --tag bookworm:latest --file Dockerfile .
 bash build.sh
 ```
 
-Then open a web browser to `http://localhost:8005`. The first time you load the webpage it will take some time for the visualization to display, as Bookworm will need to prime the MySQL cache.
+Then open a web browser to `http://localhost:8005/data/#`. The first time you load the webpage it will take some time for the visualization to display, as Bookworm will need to prime the MySQL cache.
 
 Once you're done examining your visualization, stop the container:
 
