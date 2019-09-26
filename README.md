@@ -86,7 +86,7 @@ Once you've prepared these three files, create a fresh clone of this repository,
 docker images
 
 # start the built image with data mounts and port forwarding
-docker run -p 8005:8005 -v $(pwd)/data:/data -dit bookworm:built
+docker run -p 8005:8005 -v $(pwd)/data:/data -dit bookworm
 
 # find all bookworm containers (instances of the bookworm image)
 docker ps -a
